@@ -76,8 +76,8 @@ const ConversationScreen: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <Card className="bg-noir-dark border border-noir-gold/30 p-6 shadow-lg">
-        <h2 className="font-serif text-2xl font-bold text-noir-gold mb-4">
+      <Card className="bg-white border border-amber-200 p-6 shadow-lg">
+        <h2 className="font-serif text-2xl font-bold text-amber-700 mb-4">
           Interview Transcripts
         </h2>
         
@@ -101,7 +101,7 @@ const ConversationScreen: React.FC = () => {
             })}
             
             {isTyping && (
-              <div className="text-noir-muted italic">Someone is speaking...</div>
+              <div className="text-gray-500 italic">Someone is speaking...</div>
             )}
           </div>
         </ScrollArea>
@@ -111,7 +111,7 @@ const ConversationScreen: React.FC = () => {
             variant="outline"
             onClick={handlePrev}
             disabled={!hasPrevConversations}
-            className="text-noir-paper border-noir-muted/50"
+            className="text-gray-700 border-gray-300"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Previous
@@ -121,7 +121,7 @@ const ConversationScreen: React.FC = () => {
             variant="outline"
             onClick={handleRevealAll}
             disabled={allConversationsVisible}
-            className="text-noir-gold border-noir-gold/50"
+            className="text-amber-700 border-amber-300"
           >
             <RefreshCw className="mr-2 h-4 w-4" />
             Reveal All
@@ -131,7 +131,7 @@ const ConversationScreen: React.FC = () => {
             variant="outline"
             onClick={handleNext}
             disabled={!hasMoreConversations}
-            className="text-noir-paper border-noir-muted/50"
+            className="text-gray-700 border-gray-300"
           >
             Next
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -140,12 +140,12 @@ const ConversationScreen: React.FC = () => {
       </Card>
       
       <div className="text-center mt-8">
-        <p className="text-noir-paper/70 mb-4">
+        <p className="text-gray-600 mb-4">
           Study the conversations carefully. What subtle clues can you detect in their words?
         </p>
         <Button
           onClick={() => moveToPhase('deduction')}
-          className="bg-noir-gold hover:bg-noir-gold/80 text-noir-dark font-bold"
+          className="bg-amber-700 hover:bg-amber-800 text-white font-bold"
         >
           <Brain className="mr-2 h-4 w-4" />
           Make Your Deduction

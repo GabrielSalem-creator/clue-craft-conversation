@@ -18,8 +18,8 @@ const GameManager: React.FC = () => {
     return (
       <GameLayout phase={gamePhase}>
         <div className="h-[60vh] flex flex-col items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-noir-gold" />
-          <p className="mt-4 text-noir-paper/70">
+          <Loader2 className="h-12 w-12 animate-spin text-amber-700" />
+          <p className="mt-4 text-gray-600">
             {gamePhase === 'start' ? 'Generating your crime scenario...' : 
              gamePhase === 'deduction' ? 'Analyzing your deduction...' : 
              'Processing...'}

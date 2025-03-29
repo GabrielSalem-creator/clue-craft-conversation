@@ -16,13 +16,13 @@ const ScenarioScreen: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <Card className="bg-noir-dark border border-noir-gold/30 p-6 shadow-lg">
+      <Card className="bg-white border border-amber-200 p-6 shadow-lg">
         <div className="flex items-center mb-4">
-          <FileText className="h-6 w-6 mr-2 text-noir-gold" />
-          <h2 className="font-serif text-2xl font-bold text-noir-gold">{activeCase.title}</h2>
+          <FileText className="h-6 w-6 mr-2 text-amber-700" />
+          <h2 className="font-serif text-2xl font-bold text-amber-700">{activeCase.title}</h2>
         </div>
         
-        <ScrollArea className="h-[300px] paper-bg rounded-md p-6 text-noir-dark">
+        <ScrollArea className="h-[300px] paper-bg rounded-md p-6 text-gray-800">
           <div className="prose prose-sm max-w-none">
             {activeCase.scenario.split('\n').map((paragraph, i) => (
               <p key={i} className="mb-4">{paragraph}</p>
@@ -33,15 +33,15 @@ const ScenarioScreen: React.FC = () => {
       
       <div>
         <div className="flex items-center mb-4">
-          <Users className="h-6 w-6 mr-2 text-noir-gold" />
-          <h2 className="font-serif text-2xl font-bold text-noir-gold">Characters Involved</h2>
+          <Users className="h-6 w-6 mr-2 text-amber-700" />
+          <h2 className="font-serif text-2xl font-bold text-amber-700">Characters Involved</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {activeCase.characters.map((character, index) => (
-            <Card key={index} className="bg-noir-dark/80 border border-noir-muted/30 p-4">
-              <h3 className="font-serif font-bold text-lg mb-1">{character.name}</h3>
-              <p className="text-sm text-noir-paper/70">{character.description}</p>
+            <Card key={index} className="bg-white border border-gray-200 p-4">
+              <h3 className="font-serif font-bold text-lg mb-1 text-gray-800">{character.name}</h3>
+              <p className="text-sm text-gray-600">{character.description}</p>
             </Card>
           ))}
         </div>
@@ -50,7 +50,7 @@ const ScenarioScreen: React.FC = () => {
       <div className="flex justify-center mt-8">
         <Button
           onClick={() => moveToPhase('conversation')}
-          className="bg-noir-gold hover:bg-noir-gold/80 text-noir-dark font-bold"
+          className="bg-amber-700 hover:bg-amber-800 text-white font-bold"
         >
           <MessageSquare className="mr-2 h-4 w-4" />
           Continue to Interviews
