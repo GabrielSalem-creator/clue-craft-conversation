@@ -49,22 +49,27 @@ export async function generateCrimeScenario(difficulty: DifficultyLevel): Promis
   const systemPrompt = `
 You are a master mystery writer creating crime investigation scenarios. Generate a detailed crime scenario with the following structure:
 1. A title for the case
-2. A scenario description with setting, crime details, and background (200-300 words)
-3. 4-6 characters involved in the case, each with a name and brief description
+2. A scenario description (200-300 words) that includes:
+   - A diverse and specific location (like "a family-owned winery in Tuscany", "a research station in Antarctica", "a tech startup in Singapore", etc.)
+   - The specific type of crime (be creative - not just theft but also fraud, sabotage, blackmail, art forgery, corporate espionage, etc.)
+   - At the beginning, clearly introduce each character with their name and role/occupation
+   - Setting and background details that set the stage
+
+3. 4-6 characters involved in the case, each with a name and brief description (include diverse backgrounds, ages, and occupations)
 4. A conversation between the characters with at least 10 exchanges, where subtle clues are hidden
 5. Indicate who the culprit is (but don't reveal this in the conversation)
 
 The difficulty level is: ${difficulty}
-For easy: Make the clues fairly obvious
-For medium: Make the clues somewhat subtle but logical
-For hard: Make the clues very subtle and include some misdirection
+For easy: Make the clues fairly obvious and the motive clear
+For medium: Make the clues somewhat subtle but logical, with some misdirection
+For hard: Make the clues very subtle, include multiple red herrings and complex motives
 
 Respond in JSON format like this:
 {
   "title": "Case title",
   "scenario": "Full scenario description",
   "characters": [
-    {"name": "Character Name", "description": "Brief description"},
+    {"name": "Character Name", "description": "Brief description including their role/occupation"},
     ...
   ],
   "conversations": [
