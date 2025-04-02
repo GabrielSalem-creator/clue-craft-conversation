@@ -4,10 +4,11 @@ import { useGameContext } from "../../contexts/GameContext";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Textarea } from "../../components/ui/textarea";
-import { FileText, MessageSquare, CheckCircle } from "lucide-react";
+import { FileText, MessageSquare, CheckCircle, Users } from "lucide-react";
+import { ScrollArea } from "../../components/ui/scroll-area";
 
 const DeductionScreen: React.FC = () => {
-  const { gameState, updateUserDeduction, submitDeduction, moveToPhase } = useGameContext();
+  const { gameState, updateUserDeduction, submitDeduction } = useGameContext();
   const { activeCase, userDeduction } = gameState;
   const [isReviewing, setIsReviewing] = useState(false);
   
@@ -19,8 +20,6 @@ const DeductionScreen: React.FC = () => {
     setIsReviewing(!isReviewing);
   };
   
-  const characterOptions = activeCase.characters.map(char => char.name);
-  
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {isReviewing ? (
@@ -30,9 +29,26 @@ const DeductionScreen: React.FC = () => {
               <FileText className="h-5 w-5 mr-2 text-amber-700" />
               <h2 className="font-serif text-xl font-bold text-amber-700">Case File: {activeCase.title}</h2>
             </div>
-            <div className="paper-bg rounded-md p-4 text-gray-800 text-sm">
-              {activeCase.scenario.split('\n').map((paragraph, i) => (
-                <p key={i} className="mb-2">{paragraph}</p>
+            <ScrollArea className="h-[300px]">
+              <div className="paper-bg rounded-md p-4 text-gray-800 text-sm">
+                {activeCase.scenario.split('\n').map((paragraph, i) => (
+                  <p key={i} className="mb-2">{paragraph}</p>
+                ))}
+              </div>
+            </ScrollArea>
+          </Card>
+          
+          <Card className="bg-white border border-amber-200 p-6 shadow-lg">
+            <div className="flex items-center mb-4">
+              <Users className="h-5 w-5 mr-2 text-amber-700" />
+              <h2 className="font-serif text-xl font-bold text-amber-700">Characters Involved</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              {activeCase.characters.map((character, index) => (
+                <div key={index} className="bg-slate-50 p-3 rounded-md border border-gray-200">
+                  <h3 className="font-bold">{character.name}</h3>
+                  <p className="text-xs text-gray-700">{character.description}</p>
+                </div>
               ))}
             </div>
           </Card>
@@ -42,23 +58,31 @@ const DeductionScreen: React.FC = () => {
               <MessageSquare className="h-5 w-5 mr-2 text-amber-700" />
               <h2 className="font-serif text-xl font-bold text-amber-700">Interview Transcripts</h2>
             </div>
-            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-              {activeCase.conversations.map((conversation, idx) => {
-                const isCharacter = activeCase.characters.some(
-                  char => char.name === conversation.speaker
-                );
-                
-                return (
-                  <div 
-                    key={idx}
-                    className={`p-3 rounded-md ${isCharacter ? 'bg-blue-800' : 'bg-red-700'} bg-opacity-80 text-white`}
-                  >
-                    <div className="font-bold text-sm mb-1">{conversation.speaker}</div>
-                    <div className="text-xs">{conversation.text}</div>
-                  </div>
-                );
-              })}
-            </div>
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-3 pr-2">
+                {activeCase.conversations.map((conversation, idx) => {
+                  const character = activeCase.characters.find(
+                    char => char.name === conversation.speaker
+                  );
+                  const isCharacter = !!character;
+                  
+                  return (
+                    <div 
+                      key={idx}
+                      className={`p-3 rounded-md ${isCharacter ? 'bg-blue-800' : 'bg-red-700'} bg-opacity-80 text-white`}
+                    >
+                      <div className="font-bold text-sm mb-1">{conversation.speaker}</div>
+                      {character && (
+                        <div className="text-xs mb-2 text-blue-100 italic">
+                          {character.description.substring(0, 80)}...
+                        </div>
+                      )}
+                      <div className="text-xs">{conversation.text}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
           </Card>
           
           <div className="flex justify-center">
