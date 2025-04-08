@@ -39,14 +39,17 @@ export async function chatWithCohere(userMessage: string, systemPrompt?: string)
   }
 }
 
-export async function generateCrimeScenario(difficulty: DifficultyLevel): Promise<{
+export async function generateCrimeScenario(
+  difficulty: DifficultyLevel, 
+  language: 'en' | 'fr' = 'en'
+): Promise<{
   title: string;
   scenario: string;
   characters: Array<{ name: string; description: string }>;
   conversations: Array<{ speaker: string; text: string }>;
   culprit: string;
 }> {
-  const systemPrompt = `
+  const englishPrompt = `
 You are a master mystery writer creating crime investigation scenarios. Generate a detailed crime scenario with the following structure:
 1. A title for the case
 2. A scenario description (200-300 words) that includes:
@@ -69,7 +72,7 @@ Respond in JSON format like this:
   "title": "Case title",
   "scenario": "Full scenario description",
   "characters": [
-    {"name": "Character Name", "description": "Brief description including their role/occupation"},
+    {"name": "Character Name", "description": "Brief description including their role/occupation and personality traits"},
     ...
   ],
   "conversations": [
@@ -79,6 +82,42 @@ Respond in JSON format like this:
   "culprit": "Name of the guilty character"
 }
 `;
+
+  const frenchPrompt = `
+Vous êtes un maître écrivain de mystères créant des scénarios d'enquête criminelle. Générer un scénario criminel détaillé avec la structure suivante :
+1. Un titre pour l'affaire
+2. Une description du scénario (200-300 mots) qui inclut :
+   - Un lieu divers et spécifique (comme "un vignoble familial en Toscane", "une station de recherche en Antarctique", "une startup technologique à Singapour", etc.)
+   - Le type de crime spécifique (soyez créatif - pas seulement un vol mais aussi une fraude, un sabotage, un chantage, une contrefaçon d'art, de l'espionnage industriel, etc.)
+   - Au début, présentez clairement chaque personnage avec son nom et son rôle/occupation
+   - Détails de mise en scène et de contexte qui établissent le décor
+
+3. 4-6 personnages impliqués dans l'affaire, chacun avec un nom et une brève description (inclure des origines diverses, âges, professions et traits de personnalité)
+4. Une conversation entre les personnages avec au moins 10 échanges, où des indices subtils sont cachés
+5. Indiquez qui est le coupable (mais ne le révélez pas dans la conversation)
+
+Le niveau de difficulté est : ${difficulty === 'easy' ? 'facile' : difficulty === 'medium' ? 'moyen' : 'difficile'}
+Pour facile : Rendez les indices assez évidents et le mobile clair
+Pour moyen : Rendez les indices quelque peu subtils mais logiques, avec quelques fausses pistes
+Pour difficile : Rendez les indices très subtils, incluez plusieurs fausses pistes et des mobiles complexes
+
+Répondez au format JSON comme ceci :
+{
+  "title": "Titre de l'affaire",
+  "scenario": "Description complète du scénario",
+  "characters": [
+    {"name": "Nom du personnage", "description": "Brève description incluant leur rôle/occupation et traits de personnalité"},
+    ...
+  ],
+  "conversations": [
+    {"speaker": "Nom du personnage", "text": "Ce qu'ils disent"},
+    ...
+  ],
+  "culprit": "Nom du personnage coupable"
+}
+`;
+
+  const systemPrompt = language === 'en' ? englishPrompt : frenchPrompt;
 
   try {
     const response = await chatWithCohere("Generate a new crime scenario", systemPrompt);
@@ -91,28 +130,40 @@ Respond in JSON format like this:
     return parsedResponse;
   } catch (error) {
     console.error("Error generating crime scenario:", error);
-    toast.error("Failed to generate crime scenario");
+    const errorMessage = language === 'en' 
+      ? "Failed to generate crime scenario" 
+      : "Échec de la génération du scénario criminel";
+    toast.error(errorMessage);
     
     // Return a fallback scenario
     return {
-      title: "Error in Case Generation",
-      scenario: "We're having trouble connecting to our mystery writing AI. Please try again later.",
-      characters: [{ name: "System", description: "Error occurred" }],
-      conversations: [{ speaker: "System", text: "Error generating conversation" }],
-      culprit: "Unknown"
+      title: language === 'en' ? "Error in Case Generation" : "Erreur dans la génération de l'affaire",
+      scenario: language === 'en' 
+        ? "We're having trouble connecting to our mystery writing AI. Please try again later."
+        : "Nous avons des difficultés à nous connecter à notre IA d'écriture de mystères. Veuillez réessayer plus tard.",
+      characters: [{ 
+        name: "System", 
+        description: language === 'en' ? "Error occurred" : "Une erreur s'est produite" 
+      }],
+      conversations: [{ 
+        speaker: "System", 
+        text: language === 'en' ? "Error generating conversation" : "Erreur lors de la génération de la conversation" 
+      }],
+      culprit: language === 'en' ? "Unknown" : "Inconnu"
     };
   }
 }
 
 export async function evaluateDeduction(
   scenario: any,
-  userDeduction: string
+  userDeduction: string,
+  language: 'en' | 'fr' = 'en'
 ): Promise<{
   correct: boolean;
   feedback: string;
   reasoning: string;
 }> {
-  const systemPrompt = `
+  const englishPrompt = `
 You are an expert detective evaluating a user's deduction for a crime scenario.
 
 The crime scenario is:
@@ -130,6 +181,26 @@ Respond in JSON format:
 }
 `;
 
+  const frenchPrompt = `
+Vous êtes un détective expert évaluant la déduction d'un utilisateur pour un scénario criminel.
+
+Le scénario criminel est :
+${JSON.stringify(scenario)}
+
+La déduction de l'utilisateur est :
+"${userDeduction}"
+
+Évaluez si l'utilisateur a correctement identifié le coupable et si son raisonnement était solide.
+Répondez au format JSON :
+{
+  "correct": true/false,
+  "feedback": "Bref commentaire sur leur déduction globale (50-100 mots)",
+  "reasoning": "Analyse détaillée de leur raisonnement (100-200 mots)"
+}
+`;
+
+  const systemPrompt = language === 'en' ? englishPrompt : frenchPrompt;
+
   try {
     const response = await chatWithCohere("Evaluate user deduction", systemPrompt);
     
@@ -140,13 +211,20 @@ Respond in JSON format:
     return parsedResponse;
   } catch (error) {
     console.error("Error evaluating deduction:", error);
-    toast.error("Failed to evaluate your deduction");
+    const errorMessage = language === 'en'
+      ? "Failed to evaluate your deduction"
+      : "Échec de l'évaluation de votre déduction";
+    toast.error(errorMessage);
     
     // Return a fallback evaluation
     return {
       correct: false,
-      feedback: "We couldn't evaluate your deduction due to a technical issue.",
-      reasoning: "Please try submitting your deduction again later."
+      feedback: language === 'en'
+        ? "We couldn't evaluate your deduction due to a technical issue."
+        : "Nous n'avons pas pu évaluer votre déduction en raison d'un problème technique.",
+      reasoning: language === 'en'
+        ? "Please try submitting your deduction again later."
+        : "Veuillez essayer de soumettre à nouveau votre déduction plus tard."
     };
   }
 }

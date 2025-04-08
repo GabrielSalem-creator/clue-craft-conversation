@@ -21,6 +21,7 @@ interface GameState {
     feedback: string;
     reasoning: string;
   } | null;
+  language: 'en' | 'fr'; // Added language option
 }
 
 interface GameContextProps {
@@ -31,6 +32,7 @@ interface GameContextProps {
   submitDeduction: () => Promise<void>;
   moveToPhase: (phase: GameState['gamePhase']) => void;
   resetGame: () => void;
+  setLanguage: (language: 'en' | 'fr') => void; // Added language setter
 }
 
 // Create the context with default values
@@ -43,17 +45,22 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     difficulty: 'medium',
     gamePhase: 'start',
     userDeduction: '',
-    evaluationResult: null
+    evaluationResult: null,
+    language: 'en' // Default to English
   });
 
   const setDifficulty = (difficulty: DifficultyLevel) => {
     setGameState(prev => ({ ...prev, difficulty }));
   };
 
+  const setLanguage = (language: 'en' | 'fr') => {
+    setGameState(prev => ({ ...prev, language }));
+  };
+
   const generateNewCase = async () => {
     setGameState(prev => ({ ...prev, isLoading: true }));
     try {
-      const newCase = await generateCrimeScenario(gameState.difficulty);
+      const newCase = await generateCrimeScenario(gameState.difficulty, gameState.language);
       setGameState(prev => ({
         ...prev,
         activeCase: newCase,
@@ -62,10 +69,16 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         userDeduction: '',
         evaluationResult: null
       }));
-      toast.success("New case generated successfully!");
+      const successMessage = gameState.language === 'en' 
+        ? "New case generated successfully!" 
+        : "Nouvelle affaire générée avec succès !";
+      toast.success(successMessage);
     } catch (error) {
       console.error("Error generating case:", error);
-      toast.error("Failed to generate a new case");
+      const errorMessage = gameState.language === 'en'
+        ? "Failed to generate a new case"
+        : "Échec de la génération d'une nouvelle affaire";
+      toast.error(errorMessage);
       setGameState(prev => ({ ...prev, isLoading: false }));
     }
   };
@@ -76,13 +89,16 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const submitDeduction = async () => {
     if (!gameState.activeCase || gameState.userDeduction.trim().length < 20) {
-      toast.error("Please provide a more detailed deduction");
+      const errorMessage = gameState.language === 'en'
+        ? "Please provide a more detailed deduction"
+        : "Veuillez fournir une déduction plus détaillée";
+      toast.error(errorMessage);
       return;
     }
 
     setGameState(prev => ({ ...prev, isLoading: true }));
     try {
-      const evaluation = await evaluateDeduction(gameState.activeCase, gameState.userDeduction);
+      const evaluation = await evaluateDeduction(gameState.activeCase, gameState.userDeduction, gameState.language);
       setGameState(prev => ({
         ...prev,
         evaluationResult: evaluation,
@@ -91,7 +107,10 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }));
     } catch (error) {
       console.error("Error evaluating deduction:", error);
-      toast.error("Failed to evaluate your deduction");
+      const errorMessage = gameState.language === 'en'
+        ? "Failed to evaluate your deduction"
+        : "Échec de l'évaluation de votre déduction";
+      toast.error(errorMessage);
       setGameState(prev => ({ ...prev, isLoading: false }));
     }
   };
@@ -107,7 +126,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       difficulty: gameState.difficulty,  // Keep the existing difficulty
       gamePhase: 'start',
       userDeduction: '',
-      evaluationResult: null
+      evaluationResult: null,
+      language: gameState.language // Keep the existing language
     });
   };
 
@@ -120,7 +140,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         updateUserDeduction,
         submitDeduction,
         moveToPhase,
-        resetGame
+        resetGame,
+        setLanguage
       }}
     >
       {children}

@@ -8,10 +8,25 @@ import { FileText, Users, MessageSquare } from "lucide-react";
 
 const ScenarioScreen: React.FC = () => {
   const { gameState, moveToPhase } = useGameContext();
-  const { activeCase } = gameState;
+  const { activeCase, language } = gameState;
+
+  const texts = {
+    en: {
+      loading: "Loading case...",
+      charactersInvolved: "Characters Involved",
+      continueToInterviews: "Continue to Interviews"
+    },
+    fr: {
+      loading: "Chargement de l'affaire...",
+      charactersInvolved: "Personnages impliqués",
+      continueToInterviews: "Continuer vers les entretiens"
+    }
+  };
+
+  const t = language === 'en' ? texts.en : texts.fr;
 
   if (!activeCase) {
-    return <div>Loading case...</div>;
+    return <div>{t.loading}</div>;
   }
 
   return (
@@ -34,7 +49,7 @@ const ScenarioScreen: React.FC = () => {
       <div>
         <div className="flex items-center mb-4">
           <Users className="h-6 w-6 mr-2 text-amber-700" />
-          <h2 className="font-serif text-2xl font-bold text-amber-700">Characters Involved</h2>
+          <h2 className="font-serif text-2xl font-bold text-amber-700">{t.charactersInvolved}</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -53,7 +68,7 @@ const ScenarioScreen: React.FC = () => {
           className="bg-amber-700 hover:bg-amber-800 text-white font-bold"
         >
           <MessageSquare className="mr-2 h-4 w-4" />
-          Continue to Interviews
+          {t.continueToInterviews}
         </Button>
       </div>
     </div>
