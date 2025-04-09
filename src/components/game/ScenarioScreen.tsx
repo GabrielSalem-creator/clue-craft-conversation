@@ -165,7 +165,7 @@ const ScenarioScreen: React.FC = () => {
                 })}
               </div>
             </ScrollArea>
-          </div>
+          </Card>
         </TabsContent>
       </Tabs>
       
