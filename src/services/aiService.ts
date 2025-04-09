@@ -50,16 +50,26 @@ export async function generateCrimeScenario(
   culprit: string;
 }> {
   const englishPrompt = `
-You are a master mystery writer creating crime investigation scenarios. Generate a detailed crime scenario with the following structure:
-1. A title for the case
-2. A scenario description (200-300 words) that includes:
-   - A diverse and specific location (like "a family-owned winery in Tuscany", "a research station in Antarctica", "a tech startup in Singapore", etc.)
-   - The specific type of crime (be creative - not just theft but also fraud, sabotage, blackmail, art forgery, corporate espionage, etc.)
-   - At the beginning, clearly introduce each character with their name and role/occupation
-   - Setting and background details that set the stage
+You are a master mystery writer creating extremely diverse crime investigation scenarios. I NEED MAXIMUM CREATIVITY. Every scenario should be radically different from any previous ones. Generate a unique and detailed crime scenario with the following structure:
 
-3. 4-6 characters involved in the case, each with a name and brief description (include diverse backgrounds, ages, and occupations)
-4. A conversation between the characters with at least 10 exchanges, where subtle clues are hidden
+1. Create a captivating title for the case that reflects its unique nature
+
+2. A scenario description (200-300 words) that MUST include:
+   - A highly specific and unusual location (avoid generic settings - instead use places like "an underwater research laboratory in the Mariana Trench", "a Bedouin desert camp during a rare meteor shower", "an avant-garde fashion show in an abandoned Soviet bunker", etc.)
+   - An extremely original and unexpected crime (NO standard murders or thefts - instead create unusual crimes like "sabotage of a revolutionary clean energy invention", "theft of a previously unknown Picasso that has peculiar side effects on viewers", "manipulation of weather control technology for ransom", etc.)
+   - At the beginning, clearly introduce each character with their name, role/occupation, and any notable personality traits
+   - Rich atmospheric details that create a vivid sense of time, place, and mood
+
+3. 4-6 characters involved in the case, each with:
+   - A distinctive name reflecting varied cultural backgrounds
+   - A detailed description that includes occupation, personality traits, unique background, and motivations
+   - Unusual talents, flaws, or quirks that might be relevant to the case
+
+4. A conversation between the characters with at least 10 exchanges, where subtle clues are hidden. This conversation should:
+   - Reveal character relationships and tensions
+   - Include natural-sounding dialogue that subtly hints at motives and opportunities
+   - Contain red herrings and misdirections appropriate to the difficulty level
+
 5. Indicate who the culprit is (but don't reveal this in the conversation)
 
 The difficulty level is: ${difficulty}
@@ -67,12 +77,14 @@ For easy: Make the clues fairly obvious and the motive clear
 For medium: Make the clues somewhat subtle but logical, with some misdirection
 For hard: Make the clues very subtle, include multiple red herrings and complex motives
 
+IMPORTANT: Ensure each scenario is completely different from any previous scenario. Vary the time periods, cultural settings, types of crimes, character professions, and motivations dramatically. Think beyond typical mystery tropes.
+
 Respond in JSON format like this:
 {
   "title": "Case title",
   "scenario": "Full scenario description",
   "characters": [
-    {"name": "Character Name", "description": "Brief description including their role/occupation and personality traits"},
+    {"name": "Character Name", "description": "Detailed description including their role/occupation, personality traits, and unique background"},
     ...
   ],
   "conversations": [
@@ -84,16 +96,26 @@ Respond in JSON format like this:
 `;
 
   const frenchPrompt = `
-Vous êtes un maître écrivain de mystères créant des scénarios d'enquête criminelle. Générer un scénario criminel détaillé avec la structure suivante :
-1. Un titre pour l'affaire
-2. Une description du scénario (200-300 mots) qui inclut :
-   - Un lieu divers et spécifique (comme "un vignoble familial en Toscane", "une station de recherche en Antarctique", "une startup technologique à Singapour", etc.)
-   - Le type de crime spécifique (soyez créatif - pas seulement un vol mais aussi une fraude, un sabotage, un chantage, une contrefaçon d'art, de l'espionnage industriel, etc.)
-   - Au début, présentez clairement chaque personnage avec son nom et son rôle/occupation
-   - Détails de mise en scène et de contexte qui établissent le décor
+Vous êtes un maître écrivain de mystères créant des scénarios d'enquête criminelle extrêmement divers. J'AI BESOIN D'UN MAXIMUM DE CRÉATIVITÉ. Chaque scénario doit être radicalement différent de tous les précédents. Générez un scénario criminel unique et détaillé avec la structure suivante :
 
-3. 4-6 personnages impliqués dans l'affaire, chacun avec un nom et une brève description (inclure des origines diverses, âges, professions et traits de personnalité)
-4. Une conversation entre les personnages avec au moins 10 échanges, où des indices subtils sont cachés
+1. Créez un titre captivant pour l'affaire qui reflète sa nature unique
+
+2. Une description du scénario (200-300 mots) qui DOIT inclure :
+   - Un lieu hautement spécifique et inhabituel (évitez les décors génériques - utilisez plutôt des lieux comme "un laboratoire de recherche sous-marin dans la fosse des Mariannes", "un campement bédouin dans le désert pendant une rare pluie de météores", "un défilé de mode avant-gardiste dans un bunker soviétique abandonné", etc.)
+   - Un crime extrêmement original et inattendu (PAS de meurtres ou de vols standard - créez plutôt des crimes inhabituels comme "le sabotage d'une invention révolutionnaire d'énergie propre", "le vol d'un Picasso jusqu'alors inconnu qui a des effets secondaires particuliers sur les spectateurs", "la manipulation de la technologie de contrôle météorologique pour rançon", etc.)
+   - Au début, présentez clairement chaque personnage avec son nom, son rôle/profession, et tout trait de personnalité notable
+   - Détails atmosphériques riches qui créent un sentiment vivant de temps, de lieu et d'ambiance
+
+3. 4-6 personnages impliqués dans l'affaire, chacun avec :
+   - Un nom distinctif reflétant des origines culturelles variées
+   - Une description détaillée incluant la profession, les traits de personnalité, un parcours unique et les motivations
+   - Des talents, défauts ou particularités inhabituels qui pourraient être pertinents pour l'affaire
+
+4. Une conversation entre les personnages avec au moins 10 échanges, où des indices subtils sont cachés. Cette conversation devrait :
+   - Révéler les relations et tensions entre les personnages
+   - Inclure un dialogue naturel qui suggère subtilement les motifs et les opportunités
+   - Contenir des fausses pistes et des diversions appropriées au niveau de difficulté
+
 5. Indiquez qui est le coupable (mais ne le révélez pas dans la conversation)
 
 Le niveau de difficulté est : ${difficulty === 'easy' ? 'facile' : difficulty === 'medium' ? 'moyen' : 'difficile'}
@@ -101,12 +123,14 @@ Pour facile : Rendez les indices assez évidents et le mobile clair
 Pour moyen : Rendez les indices quelque peu subtils mais logiques, avec quelques fausses pistes
 Pour difficile : Rendez les indices très subtils, incluez plusieurs fausses pistes et des mobiles complexes
 
+IMPORTANT : Assurez-vous que chaque scénario est complètement différent de tout scénario précédent. Variez radicalement les périodes, les contextes culturels, les types de crimes, les professions des personnages et les motivations. Pensez au-delà des tropes typiques du mystère.
+
 Répondez au format JSON comme ceci :
 {
   "title": "Titre de l'affaire",
   "scenario": "Description complète du scénario",
   "characters": [
-    {"name": "Nom du personnage", "description": "Brève description incluant leur rôle/occupation et traits de personnalité"},
+    {"name": "Nom du personnage", "description": "Description détaillée incluant leur rôle/profession, traits de personnalité et parcours unique"},
     ...
   ],
   "conversations": [
