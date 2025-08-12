@@ -4,8 +4,9 @@ import { useGameContext } from "../../contexts/GameContext";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { ScrollArea } from "../../components/ui/scroll-area";
-import { Brain, ArrowRight, ArrowLeft, RefreshCw, FileText, Users } from "lucide-react";
+import { Brain, ArrowRight, ArrowLeft, RefreshCw, FileText, Users, Play, Type } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import AnimatedConversation from "./AnimatedConversation";
 
 const ConversationScreen: React.FC = () => {
   const { gameState, moveToPhase } = useGameContext();
@@ -14,6 +15,7 @@ const ConversationScreen: React.FC = () => {
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [displayIndex, setDisplayIndex] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<string>('conversations');
+  const [viewMode, setViewMode] = useState<'text' | 'animation'>('text');
 
   useEffect(() => {
     if (!activeCase) return;
@@ -86,7 +88,9 @@ const ConversationScreen: React.FC = () => {
       revealAll: "Reveal All",
       next: "Next",
       studyCarefully: "Study the conversations carefully. What subtle clues can you detect in their words?",
-      makeDeduction: "Make Your Deduction"
+      makeDeduction: "Make Your Deduction",
+      textMode: "Text View",
+      animationMode: "Animation View"
     },
     fr: {
       interviews: "Transcriptions des entretiens",
@@ -97,7 +101,9 @@ const ConversationScreen: React.FC = () => {
       revealAll: "Tout révéler",
       next: "Suivant",
       studyCarefully: "Étudiez attentivement les conversations. Quels indices subtils pouvez-vous détecter dans leurs paroles ?",
-      makeDeduction: "Faire votre déduction"
+      makeDeduction: "Faire votre déduction",
+      textMode: "Vue texte",
+      animationMode: "Vue animation"
     }
   };
 
@@ -114,70 +120,104 @@ const ConversationScreen: React.FC = () => {
         
         <TabsContent value="conversations">
           <Card className="bg-white border border-amber-200 p-6 shadow-lg">
-            <h2 className="font-serif text-2xl font-bold text-amber-700 mb-4">
-              {t.interviews}
-            </h2>
-            
-            <ScrollArea className="h-[400px]">
-              <div className="space-y-4">
-                {visibleCurrentConversations.map((conversation, idx) => {
-                  const absoluteIdx = displayIndex * 4 + idx;
-                  const character = activeCase.characters.find(char => char.name === conversation.speaker);
-                  const isCharacter = !!character;
-                  
-                  return (
-                    <div 
-                      key={absoluteIdx}
-                      className={`p-4 rounded-md ${isCharacter ? 'bg-blue-800' : 'bg-red-700'} bg-opacity-80 text-white`}
-                    >
-                      <div className="font-bold mb-1">{conversation.speaker}</div>
-                      <div className="text-sm mb-2">{conversation.text}</div>
-                      {character && (
-                        <div className="mt-2 text-xs italic bg-white/10 p-2 rounded">
-                          {character.description}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-                
-                {isTyping && (
-                  <div className="text-gray-500 italic">{t.speaking}</div>
-                )}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="font-serif text-2xl font-bold text-amber-700">
+                {t.interviews}
+              </h2>
+              
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === 'text' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('text')}
+                  className="text-xs"
+                >
+                  <Type className="mr-1 h-3 w-3" />
+                  {t.textMode}
+                </Button>
+                <Button
+                  variant={viewMode === 'animation' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('animation')}
+                  className="text-xs"
+                >
+                  <Play className="mr-1 h-3 w-3" />
+                  {t.animationMode}
+                </Button>
               </div>
-            </ScrollArea>
-            
-            <div className="flex justify-between items-center mt-4">
-              <Button
-                variant="outline"
-                onClick={handlePrev}
-                disabled={!hasPrevConversations}
-                className="text-gray-700 border-gray-300"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                {t.previous}
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleRevealAll}
-                disabled={allConversationsVisible}
-                className="text-amber-700 border-amber-300"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                {t.revealAll}
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleNext}
-                disabled={!hasMoreConversations}
-                className="text-gray-700 border-gray-300"
-              >
-                {t.next}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
             </div>
+            
+            {viewMode === 'text' ? (
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-4">
+                  {visibleCurrentConversations.map((conversation, idx) => {
+                    const absoluteIdx = displayIndex * 4 + idx;
+                    const character = activeCase.characters.find(char => char.name === conversation.speaker);
+                    const isCharacter = !!character;
+                    
+                    return (
+                      <div 
+                        key={absoluteIdx}
+                        className={`p-4 rounded-md ${isCharacter ? 'bg-blue-800' : 'bg-red-700'} bg-opacity-80 text-white`}
+                      >
+                        <div className="font-bold mb-1">{conversation.speaker}</div>
+                        <div className="text-sm mb-2">{conversation.text}</div>
+                        {character && (
+                          <div className="mt-2 text-xs italic bg-white/10 p-2 rounded">
+                            {character.description}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  
+                  {isTyping && (
+                    <div className="text-gray-500 italic">{t.speaking}</div>
+                  )}
+                </div>
+              </ScrollArea>
+            ) : (
+              <AnimatedConversation
+                conversations={activeCase.conversations}
+                characters={activeCase.characters}
+                scenario={activeCase.scenario}
+                language={language}
+              />
+            )}
+            
+            {viewMode === 'text' && (
+              <div className="flex justify-between items-center mt-4">
+                <Button
+                  variant="outline"
+                  onClick={handlePrev}
+                  disabled={!hasPrevConversations}
+                  className="text-gray-700 border-gray-300"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  {t.previous}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={handleRevealAll}
+                  disabled={allConversationsVisible}
+                  className="text-amber-700 border-amber-300"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  {t.revealAll}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={handleNext}
+                  disabled={!hasMoreConversations}
+                  className="text-gray-700 border-gray-300"
+                >
+                  {t.next}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </Card>
         </TabsContent>
         
